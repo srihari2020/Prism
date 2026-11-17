@@ -1,0 +1,15 @@
+# Python and Environments
+prism_env/
+__pycache__/
+*.pyc
+
+# ML Weights and Data (Do not push these to GitHub)
+models/
+data/raw_images/
+*.safetensors
+*.gguf
+*.pt
+*.bin
+
+# Output generations
+output.png
