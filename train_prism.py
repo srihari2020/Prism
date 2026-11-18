@@ -3,13 +3,13 @@ import torch.nn.functional as F
 from diffusers import StableDiffusionPipeline, DDPMScheduler
 from peft import LoraConfig, get_peft_model
 from datasets import load_dataset
-from torchvision import transforms
+import custom_transforms as transforms
 import bitsandbytes as bnb
 
 # 1. Load the Base Diffusion Model
 # We are using SD 1.5 as the base here because it safely fits in 8GB VRAM for training.
 # Once training works, you can swap this path to an uncensored local model from Civitai.
-model_id = "runwayml/stable-diffusion-v1-5"
+model_id = "SG161222/Realistic_Vision_V5.1_noVAE"
 print(f"Loading Prism Base Model: {model_id}")
 
 pipeline = StableDiffusionPipeline.from_pretrained(
@@ -67,7 +67,7 @@ def tokenize_captions(examples):
     return inputs.input_ids
 
 # 5. The Core Training Loop
-epochs = 10
+epochs = 100
 print("Initializing Prism Gradient Descent...")
 
 for epoch in range(epochs):
