@@ -1,9 +1,11 @@
 import subprocess
 
-print("Starting Prism Engine: FLUX LoRA Fine-Tuning...")
+print("Starting Prism Engine: Lightweight FLUX Fine-Tuning...")
 
+# Running directly through Python prevents the multi-process memory duplication 
+# that triggers the WSL OOM killer.
 command = [
-    "accelerate", "launch", "flux_trainer.py",
+    "python", "flux_trainer.py",
     "--pretrained_model_name_or_path=black-forest-labs/FLUX.1-schnell",
     "--instance_data_dir=data/raw_images",
     "--instance_prompt=A cinematic portrait of prism_target",
