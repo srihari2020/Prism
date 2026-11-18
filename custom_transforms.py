@@ -1,44 +1,72 @@
-from PIL import Image
-import torch
-import numpy as np
 import random
+import numpy as np
+import torch
+from PIL import Image
 
-class Compose:
-    def __init__(self, transforms): self.transforms = transforms
-    def __call__(self, img):
-        for t in self.transforms: img = t(img)
-        return img
+class InterpolationMode:
+    BILINEAR = Image.BILINEAR
+    BICUBIC = Image.BICUBIC
+    LANCZOS = Image.LANCZOS
 
 class Resize:
-    def __init__(self, size, interpolation=None):
+    def __init__(self, size, interpolation=Image.BILINEAR):
         self.size = (size, size) if isinstance(size, int) else size
-    def __call__(self, img): return img.resize(self.size, Image.BILINEAR)
+        self.interpolation = interpolation
+    def __call__(self, img):
+        return img.resize(self.size, self.interpolation)
 
 class CenterCrop:
     def __init__(self, size):
         self.size = (size, size) if isinstance(size, int) else size
     def __call__(self, img):
-        w, h = img.size; th, tw = self.size
-        return img.crop(((w - tw) // 2, (h - th) // 2, (w + tw) // 2, (h + th) // 2))
+        th, tw = self.size
+        w, h = img.size
+        x1 = max(0, (w - tw) // 2)
+        y1 = max(0, (h - th) // 2)
+        return img.crop((x1, y1, x1 + tw, y1 + th))
 
-class RandomHorizontalFlip:
-    def __init__(self, p=0.5): self.p = p
+class RandomCrop:
+    def __init__(self, size):
+        self.size = (size, size) if isinstance(size, int) else size
     def __call__(self, img):
-        if random.random() < self.p: return img.transpose(Image.FLIP_LEFT_RIGHT)
-        return img
+        th, tw = self.size
+        w, h = img.size
+        if w == tw and h == th: return img
+        x1 = random.randint(0, max(0, w - tw))
+        y1 = random.randint(0, max(0, h - th))
+        return img.crop((x1, y1, x1 + tw, y1 + th))
+    @staticmethod
+    def get_params(img, output_size):
+        w, h = img.size
+        th, tw = output_size
+        if w == tw and h == th: return 0, 0, h, w
+        i = random.randint(0, max(0, h - th))
+        j = random.randint(0, max(0, w - tw))
+        return i, j, th, tw
 
 class ToTensor:
     def __call__(self, img):
-        if img.mode != 'RGB': img = img.convert('RGB')
-        return torch.from_numpy(np.array(img)).permute(2, 0, 1).float() / 255.0
+        img = np.array(img)
+        if len(img.shape) == 2: img = np.expand_dims(img, axis=2)
+        img = img.transpose((2, 0, 1))
+        return torch.from_numpy(img).float() / 255.0
 
 class Normalize:
     def __init__(self, mean, std):
-        self.mean = torch.tensor(mean).view(-1, 1, 1)
-        self.std = torch.tensor(std).view(-1, 1, 1)
-    def __call__(self, tensor): return (tensor - self.mean) / self.std
+        self.mean = mean
+        self.std = std
+    def __call__(self, tensor):
+        for t, m, s in zip(tensor, self.mean, self.std):
+            t.sub_(m).div_(s)
+        return tensor
 
-class InterpolationMode:
-    BILINEAR = Image.BILINEAR
-    BICUBIC = Image.BICUBIC
-    NEAREST = Image.NEAREST
+class Compose:
+    def __init__(self, transforms):
+        self.transforms = transforms
+    def __call__(self, img):
+        for t in self.transforms:
+            img = t(img)
+        return img
+
+def crop(img, top, left, height, width):
+    return img.crop((left, top, left + width, top + height))
