@@ -1,7 +1,4 @@
-python3 - << 'PYEOF'
-from huggingface_hub import HfApi
-
-readme = """---
+---
 license: mit
 pipeline_tag: text-to-image
 library_name: diffusers
@@ -32,12 +29,19 @@ tags:
 - **8GB VRAM Optimized**: Uses `bfloat16`, `enable_model_cpu_offload()`, VAE tiling, and automatic CUDA cache clearing when switching engines.
 - **Zero-Config UI**: Minimal interface—type a prompt, hit Generate, and download the output.
 
-## Repository Structure
-```text
-prism-auto-studio/
-├── app.py                  # Streamlit application & auto-routing logic
-├── requirements.txt        # Python dependencies
-├── README.md               # Model card & documentation
-└── models/
-    ├── realvisxl/          # RealVisXL V5.0 Lightning (diffusers weights)
-    └── animagine/          # Animagine XL 3.1 (diffusers weights)
+## Quick Start
+1. Clone the repository: `git lfs install && git clone https://huggingface.co/Srihari2020/prism-auto-studio`
+2. Enter the folder: `cd prism-auto-studio`
+3. Install dependencies: `pip install -r requirements.txt`
+4. Launch the studio: `streamlit run app.py`
+
+## Hardware Requirements
+- **GPU**: NVIDIA GPU with **8GB+ VRAM** (tested on RTX 5060 8GB).
+- **RAM**: 16GB+ system RAM recommended for CPU offloading.
+- **Storage**: ~15GB free disk space for both bundled SDXL models.
+
+## Credits & Licenses
+- Application code is released under the **MIT License**.
+- Bundled base weights follow their respective upstream licenses:
+  - [SG161222/RealVisXL_V5.0_Lightning](https://huggingface.co/SG161222/RealVisXL_V5.0_Lightning)
+  - [cagliostrolab/animagine-xl-3.1](https://huggingface.co/cagliostrolab/animagine-xl-3.1)
