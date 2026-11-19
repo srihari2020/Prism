@@ -93,7 +93,10 @@ def load_engine(mode: str):
     gc.collect()
     torch.cuda.empty_cache()
 
-    model_id = "cagliostrolab/animagine-xl-3.1" if mode == "anime" else "SG161222/RealVisXL_V5.0_Lightning"
+    if mode == "anime":
+        model_id = "models/animagine" if os.path.isdir("models/animagine") else "cagliostrolab/animagine-xl-3.1"
+    else:
+        model_id = "models/realvisxl" if os.path.isdir("models/realvisxl") else "SG161222/RealVisXL_V5.0_Lightning"
     txt2img = StableDiffusionXLPipeline.from_pretrained(
         model_id,
         torch_dtype=torch.bfloat16,
