@@ -1,16 +1,11 @@
-# Python and Environments
-prism_env/
+prism_venv/
 __pycache__/
 *.pyc
-
-# ML Weights and Data (Do not push these to GitHub)
+.env
 models/
-data/raw_images/
+data/
+outputs/
+kohya_engine/
 *.safetensors
-*.gguf
-*.pt
-*.bin
-
-# Output generations
-output.png
-models/
+*.pth
+*.ckpt
